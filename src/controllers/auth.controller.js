@@ -5,11 +5,11 @@ import {
 
 export const signup = async (req, res) => {
   try {
-    const { name, email, password } = res.locals;
+    const { name, email, password, phone, CPF } = res.locals;
     if ((await readUserByEmail(email)).rowCount !== 0)
       return res.status(409).send("email already registered.");
 
-    await createUser(name, email, bcrypt.hashSync(password, 10));
+    await createUser(name, email, bcrypt.hashSync(password, 10), phone, CPF);
 
     return res.sendStatus(201);
   }
@@ -29,7 +29,7 @@ export const signin = async (req, res) => {
     await createSession(user.id);
     const { rows: [{ token }] } = await readSessionByUserId(user.id);
 
-    return res.send({ token });
+    return res.send({ token, name: user.name });
   }
   catch (err) { res.status(500).send(err.message); }
 };
